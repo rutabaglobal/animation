@@ -1,0 +1,378 @@
+<style>
+
+  .ll-wrap {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    background: #F5F5F5;
+    font-family: 'Arial Black', 'Arial', sans-serif;
+    padding: 60px 16px;
+  }
+
+  /* Marquee background */
+  .ll-marquee {
+    position: absolute;
+    width: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .ll-row {
+    white-space: nowrap;
+    font-size: 110px;
+    font-weight: 850;
+    color: rgba(0,0,0,0.02);
+    line-height: 0.85;
+  }
+
+  .ll-row.left  { animation: llLeft  30s linear infinite; }
+  .ll-row.right { animation: llRight 30s linear infinite; }
+
+  @keyframes llLeft  { 0% { transform: translateX(-50%); } 100% { transform: translateX(0); } }
+  @keyframes llRight { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+  /* Main content */
+  .ll-content {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    cursor: pointer;
+  }
+
+  .ll-logo-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: nowrap;
+  }
+
+  .ll-text {
+    font-size: clamp(37px, 9vw, 100px);
+    font-weight: 900;
+    line-height: 1;
+    white-space: nowrap;
+    letter-spacing: -2px;
+    transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+    z-index: 2;
+  }
+
+  .ll-leopard { color: #111111; }
+  .ll-lead    { color: #E8B820; }
+
+  /* Buttons container — NO overflow:hidden so buttons don't clip */
+  .ll-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex-shrink: 0;
+    width: 0;
+    opacity: 0;
+    transition: width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s,
+                opacity 0.4s ease 0.15s;
+    white-space: nowrap;
+    position: relative;
+    z-index: 3;
+    align-items: center;
+  }
+
+  .ll-btn {
+    display: block;
+    padding: 7px 21px;
+    border-radius: 50px;
+    font-size: clamp(13px, 2vw, 16px);
+    font-weight: 700;
+    text-align: center;
+    cursor: pointer;
+    border: none;
+    letter-spacing: 0.3px;
+    opacity: 0;
+    transform: translateY(10px) scale(0.9);
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+                background 0.2s ease;
+    box-shadow: none !important;
+    outline: none;
+    width: max-content;
+  }
+
+  .ll-btn-mission { background: #737270; color: #fff; transition-delay: 0.15s; }
+  .ll-btn-vision  { background: #E8B820; color: #fff; transition-delay: 0.22s; }
+  .ll-btn-goal    { background: #111111; color: #fff; transition-delay: 0.29s; }
+
+  .ll-btn:hover { transform: translateY(-2px) scale(1.05) !important; }
+  .ll-btn-mission:hover { background: #ddddd9; }
+  .ll-btn-vision:hover  { background: #d4a718; }
+  .ll-btn-goal:hover    { background: #333; }
+
+  .ll-dot {
+    display: inline-block;
+    width: 14px; height: 14px;
+    background: #E8B820;
+    border-radius: 50%;
+    margin: 0 2px;
+    flex-shrink: 0;
+    align-self: center;
+    opacity: 0;
+    transform: scale(0);
+    transition: opacity 0.3s ease 0.2s, transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s;
+    position: relative;
+    z-index: 2;
+  }
+
+  .ll-desc {
+  text-align: center;
+  font-size: clamp(14px, 2.2vw, 23px);
+  font-weight: 300 !important;   /* 👈 FORCE THIN */
+  color: #222;
+  max-width: 1000px;
+  margin: 28px auto 0;
+  min-height: 60px;
+  line-height: 1.6;
+  padding: 0 12px;
+
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+
+  /* 👇 IMPORTANT FIX */
+  font-family: Arial, sans-serif !important;
+}
+
+  .ll-desc.visible { opacity: 1; transform: translateY(0); }
+
+  /* Hover & active states */
+  .ll-content:hover .ll-leopard,
+  .ll-content.active .ll-leopard { transform: translateX(-24px); }
+
+  .ll-content:hover .ll-lead,
+  .ll-content.active .ll-lead    { transform: translateX(24px); }
+
+  .ll-content:hover .ll-buttons,
+  .ll-content.active .ll-buttons { width: 160px; opacity: 1; }
+
+  .ll-content:hover .ll-btn,
+  .ll-content.active .ll-btn     { opacity: 1; transform: translateY(0) scale(1); }
+
+  .ll-content:hover .ll-dot,
+  .ll-content.active .ll-dot     { opacity: 1; transform: scale(1); }
+
+  @media (max-width: 600px) {
+    .ll-wrap { padding: 40px 12px; }
+    .ll-row  { font-size: 60px; }
+    .ll-text { letter-spacing: -1px; }
+    .ll-btn  { padding: 9px 18px; }
+    .ll-desc { margin-top: 20px; min-height: 80px; }
+  }
+  /* ===== MOBILE CLEAN UI (AUTO SWITCH) ===== */
+@media (max-width:768px){
+
+  .ll-logo-wrapper{
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  /* Title */
+  .ll-text{
+    font-size: 52px !important;
+    letter-spacing: -1px;
+  }
+
+  /* Buttons row */
+  .ll-buttons{
+    width: auto !important;
+    opacity: 1 !important;
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 6px;
+  }
+
+  /* Buttons clean style */
+  .ll-btn{
+    opacity: 1 !important;
+    transform: none !important;
+    padding: 6px 14px;
+    font-size: 14pxpx;
+    border-radius: 20px;
+    background: rgba(0,0,0,0.05);
+    color: #333;
+  }
+
+  /* Active button */
+  .ll-btn.active{
+    background: #E8B820 !important;
+    color: #fff !important;
+  }
+
+  /* Remove desktop animation */
+  .ll-content:hover .ll-leopard,
+  .ll-content:hover .ll-lead{
+    transform: none !important;
+  }
+
+  .ll-dot{
+    display: none;
+  }
+
+  /* Description */
+  .ll-desc{
+    font-size: 18px;
+    font-weight: 200 !important;
+    margin-top: 1px;
+  }
+}
+/* ===== DARK MODE (YOUR SITE) ===== */
+body[data-theme="dark"] .ll-wrap{
+  background: #0e0e0e !important;
+}
+
+body[data-theme="dark"] .ll-row{
+  color: rgba(255,255,255,0.05) !important;
+}
+
+body[data-theme="dark"] .ll-leopard{
+  color: #ffffff !important;
+}
+
+body[data-theme="dark"] .ll-lead{
+  color: #E8B820 !important;
+}
+
+body[data-theme="dark"] .ll-btn{
+  background: rgba(255,255,255,0.08) !important;
+  color: #ffffff !important;
+}
+
+body[data-theme="dark"] .ll-btn.active{
+  background: #E8B820 !important;
+  color: #000 !important;
+}
+
+body[data-theme="dark"] .ll-desc{
+  color: #dddddd !important;
+}
+
+body[data-theme="dark"] .ll-dot{
+  background: #E8B820 !important;
+}
+.ll-btn {
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+.ll-desc {
+  transition: none !important;
+}
+/* ===== FORCE TRUE FULL WIDTH (SAFE FIX) ===== */
+
+.ll-wrap {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 40px 0 !important;
+  box-sizing: border-box;
+}
+
+/* Fix Elementor inner container */
+.elementor-section .elementor-container{
+  max-width: 100% !important;
+  width: 100% !important;
+}
+
+/* Remove inner padding Elementor adds */
+.elementor-section{
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+@media (max-width:768px){
+  .ll-wrap {
+    padding-top: 30px !important;
+    padding-bottom: 30px !important;
+  }
+}
+</style>
+
+<div class="ll-wrap">
+
+  <!-- Marquee background -->
+  <div class="ll-marquee">
+    <div class="ll-row left">INNOVATION•TRANSFORMING•DIGITAL•INNOVATION•TRANSFORMING•DIGITAL•INNOVATION•TRANSFORMING•DIGITAL•</div>
+    <div class="ll-row right">INNOVATION•TRANSFORMING•DIGITAL•INNOVATION•TRANSFORMING•DIGITAL•INNOVATION•TRANSFORMING•DIGITAL•</div>
+    <div class="ll-row left">INNOVATION•TRANSFORMING•DIGITAL•INNOVATION•TRANSFORMING•DIGITAL•INNOVATION•TRANSFORMING•DIGITAL•</div>
+    <div class="ll-row right">INNOVATION•TRANSFORMING•DIGITAL•INNOVATION•TRANSFORMING•DIGITAL•INNOVATION•TRANSFORMING•DIGITAL•</div>
+    <div class="ll-row left">INNOVATION•TRANSFORMING•DIGITAL•INNOVATION•TRANSFORMING•DIGITAL•INNOVATION•TRANSFORMING•DIGITAL•</div>
+    <div class="ll-row right">INNOVATION•TRANSFORMING•DIGITAL•INNOVATION•TRANSFORMING•DIGITAL•INNOVATION•TRANSFORMING•DIGITAL•</div>
+  </div>
+
+  <!-- Main content -->
+  <div class="ll-content" id="llContent">
+    <div class="ll-logo-wrapper">
+      <span class="ll-text ll-leopard">Leopard</span>
+      <div class="ll-buttons" id="llButtons">
+        <button class="ll-btn ll-btn-mission" id="llMission">Mission</button>
+        <button class="ll-btn ll-btn-vision"  id="llVision">Vision</button>
+        <button class="ll-btn ll-btn-goal"    id="llGoal">Goal</button>
+      </div>
+      <span class="ll-dot"></span>
+      <span class="ll-text ll-lead">Lead</span>
+    </div>
+    <div class="ll-desc" id="llDesc"></div>
+  </div>
+
+</div>
+
+<script>
+(function() {
+  var content = document.getElementById('llContent');
+  var desc    = document.getElementById('llDesc');
+
+  var texts = {
+    mission: 'Our mission is to deliver exceptional digital experiences through innovative solutions that drive growth and create lasting value for our clients and their communities.',
+    vision:  'Our vision is to be a global leader in digital transformation, empowering businesses to thrive in an ever-evolving technological landscape while maintaining sustainable practices.',
+    goal:    'Our primary goal is to consistently exceed client expectations by combining cutting-edge technology with human-centric design, fostering meaningful connections between brands and their audiences.'
+  };
+
+  function showDesc(text) {
+    desc.textContent = text;
+    desc.classList.add('visible');
+  }
+
+  function hideDesc() {
+    desc.classList.remove('visible');
+    setTimeout(function() { if (!desc.classList.contains('visible')) desc.textContent = ''; }, 350);
+  }
+
+  var isMobile = function() { return window.matchMedia('(hover: none)').matches; };
+
+  document.getElementById('llMission').addEventListener('mouseenter', function() { showDesc(texts.mission); });
+  document.getElementById('llMission').addEventListener('mouseleave', hideDesc);
+  document.getElementById('llVision').addEventListener('mouseenter',  function() { showDesc(texts.vision); });
+  document.getElementById('llVision').addEventListener('mouseleave',  hideDesc);
+  document.getElementById('llGoal').addEventListener('mouseenter',   function() { showDesc(texts.goal); });
+  document.getElementById('llGoal').addEventListener('mouseleave',   hideDesc);
+
+  content.addEventListener('click', function(e) {
+    if (!isMobile()) return;
+    var btn = e.target.closest('.ll-btn');
+    if (btn) {
+      e.stopPropagation();
+      if (btn.id === 'llMission') showDesc(texts.mission);
+      if (btn.id === 'llVision')  showDesc(texts.vision);
+      if (btn.id === 'llGoal')    showDesc(texts.goal);
+      return;
+    }
+    content.classList.toggle('active');
+    if (!content.classList.contains('active')) hideDesc();
+  });
+
+  document.addEventListener('click', function(e) {
+    if (isMobile() && !content.contains(e.target)) {
+      content.classList.remove('active');
+      hideDesc();
+    }
+  });
+})();
+</script>
